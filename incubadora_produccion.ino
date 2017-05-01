@@ -1,4 +1,4 @@
-#include <Time.h> 
+#include <Time.h>
 #include <TimeAlarms.h>
 #include <DHT.h>
 /*Prueba de LCD por protocolo I2C 
