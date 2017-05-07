@@ -91,10 +91,12 @@ void setup()
   digitalWrite(HATCHER_LED,LOW);
   
   setTime(0,00,0,1,1,17); // set time to Saturday 8:29:00am Jan 1 2011
-  Alarm.timerRepeat(turner_delay, program_turner);
-  Alarm.timerRepeat(out_fan_delay, program_out_fan);
+  
   switch_relays_off();
-  check_hatcher();
+  if (!check_hatcher()){
+    Alarm.timerRepeat(turner_delay, program_turner);
+    Alarm.timerRepeat(out_fan_delay, program_out_fan);
+    }
 }
 
 void  loop(){  
@@ -216,14 +218,14 @@ bool check_hatcher(){
   //Serial.println(switch_status);
    if (switch_status){
     Serial.print("\n---------------------MODO NACEDORA--------------");
-    tempMax = 35.3;
-    tempMin = 35.1;
+    tempMax = 35.7;
+    tempMin = 35.5;
     digitalWrite(HATCHER_LED,HIGH);
     }
   else{
     Serial.print("\n---------------------MODO INCUBADORA--------------");
-    tempMax = 36.3;
-    tempMin = 36.1;
+    tempMax = 36.8;
+    tempMin = 36.6;
     digitalWrite(INCUBATOR_LED,HIGH);
     }
   Serial.print("\nTemperaturas: \tMIN-> ");
