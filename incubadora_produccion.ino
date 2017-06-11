@@ -131,42 +131,40 @@ void  loop(){
   
   if (current_temp > 1 && current_temp < 60){
     if (current_temp < tempMin && !risingTemp){
+        digitalWrite(HEAT_RELAY, LOW);
+        risingTemp = true;
+        start_fans(6);//switch the fans briefly on to move hot air down
         digitalClockDisplay();
         Serial.print("Temperatura actual: ");
         Serial.println(current_temp);
         Serial.println("TEMPERATURA LIMITE INFERIOR ALCANZADA, ENCENDIENDO TODO");
-        digitalWrite(HEAT_RELAY, LOW);
-        if (!risingTemp){
-          risingTemp = true;
-        }
-        //switch the fans briefly on to move hot air down
-        start_fans(6);
       }
       else {
         if (current_temp > tempMax && risingTemp){
+          digitalWrite(HEAT_RELAY, HIGH);
+          risingTemp = false;
+          stop_fans();
           digitalClockDisplay();
           Serial.print("Temperatura actual: ");
           Serial.println(current_temp);
           Serial.println("TEMPERATURA LIMITE SUPERIOR ALCANZADA, APAGANDO TODO");
-          digitalWrite(HEAT_RELAY, HIGH);
-          risingTemp = false;
-          stop_fans();
         }
       }
     }
   else{
       //In case of the termomether giving strange lectures, switch the relays off
+      switch_relays_off();
+      risingTemp = false;
       digitalClockDisplay();
       Serial.print("Temperatura actual: ");
       Serial.println(current_temp);
       Serial.println("ERROR DE LECTURA");
-      switch_relays_off();
     }
   if ((loop_counter % LCD_REFRESH_INTERVAL == 0) && loop_counter!=0){
     loop_counter = 0;
     //Create lines with the average values of the last loops
     lcd_line1 =  "Temperatura:" + String(stored_temp/LCD_REFRESH_INTERVAL);
-    lcd_line2 =  "Humedad:" + String(stored_hum/LCD_REFRESH_INTERVAL);
+    lcd_line2 =  "Humedad:" + String(stored_hum/LCD_REFRESH_INTERVAL) + " " + String(risingTemp);
     //Display the updated values
     refresh_lcd (lcd_line1,lcd_line2);
     //Initializate the stored values
@@ -237,59 +235,57 @@ bool check_hatcher(){
   }
 
 void start_fans(int duration) {
-  digitalClockDisplay();
-  Serial.print(" Temperatura actual: ");
-  Serial.println(current_temp);
-  Serial.println("\tActivando Ventiladores interiorires");
   if (digitalRead(AIR_RELAY) == HIGH){
     digitalWrite(AIR_RELAY,LOW);
      Alarm.timerOnce(air_duration, stop_fans); 
-    }   
+    } 
+  digitalClockDisplay();
+  Serial.print(" Temperatura actual: ");
+  Serial.println(current_temp);
+  Serial.println("\tActivando Ventiladores interiorires");  
 }
 
 void stop_fans(){
+  digitalWrite(AIR_RELAY,HIGH);
   digitalClockDisplay();
   Serial.print(" Temperatura actual: ");
   Serial.println(current_temp);
   Serial.println("\tParando Ventiladores interiorires");
-  digitalWrite(AIR_RELAY,HIGH);
   }
 
 void stop_turner(){
+  digitalWrite(TURN_RELAY,HIGH);
   digitalClockDisplay();
   Serial.print(" Temperatura actual: ");
   Serial.println(current_temp);
   Serial.println("\tParando Girador");
-  digitalWrite(TURN_RELAY,HIGH);
   }
 
 void stop_out_fan(){
+  digitalWrite(OUT_FAN_RELAY,HIGH);
   digitalClockDisplay();
   Serial.print(" Temperatura actual: ");
   Serial.println(current_temp);
   Serial.println("\tParando Ventilador exterior");
-  digitalWrite(OUT_FAN_RELAY,HIGH);
   }
 
 void program_turner() {
-    digitalClockDisplay();
-    Serial.print(" Temperatura actual: ");
-    Serial.println(current_temp);
-    Serial.print("\tActivando Girador");
-    digitalWrite(TURN_RELAY,LOW);
-    Alarm.timerOnce(turner_duration, stop_turner); 
-
-    turner_day = day();
-    turner_hour = hour();
-    turner_minute = minute();
-    
+  digitalWrite(TURN_RELAY,LOW);
+  Alarm.timerOnce(turner_duration, stop_turner); 
+  digitalClockDisplay();
+  Serial.print(" Temperatura actual: ");
+  Serial.println(current_temp);
+  Serial.print("\tActivando Girador");
+  turner_day = day();
+  turner_hour = hour();
+  turner_minute = minute();  
 }
 
 void program_out_fan(){
-    digitalClockDisplay();
-    Serial.print(" Temperatura actual: ");
-    Serial.println(current_temp);
-    digitalWrite(OUT_FAN_RELAY,LOW);
-    Serial.print("\tActivando Ventialdor exterior");
-    Alarm.timerOnce(out_fan_duration, stop_out_fan); 
+  digitalWrite(OUT_FAN_RELAY,LOW);
+  Alarm.timerOnce(out_fan_duration, stop_out_fan); 
+  Serial.print("\tActivando Ventialdor exterior");
+  digitalClockDisplay();
+  Serial.print(" Temperatura actual: ");
+  Serial.println(current_temp);  
   }
