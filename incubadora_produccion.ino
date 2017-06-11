@@ -102,6 +102,7 @@ void setup()
 void  loop(){  
   current_hum = dht.readHumidity();
   current_temp = dht.readTemperature();
+  //Serial.println(current_temp);
 
   if (loop_counter % (LCD_REFRESH_INTERVAL/2) == 0){
   lcd_line1 =  "Act.:" + String(day()-1) + "d " + String(hour()) + "h " + String(minute()) + "m";
@@ -114,11 +115,11 @@ void  loop(){
   refresh_lcd (lcd_line1,lcd_line2);
   }
 
- //if (loop_counter % DEBUG_INTERVAL == 0){
-    //digitalClockDisplay();
-    //Serial.println(current_hum);
-    //Serial.println(current_temp);
- // }
+ if (loop_counter % DEBUG_INTERVAL == 0){
+    digitalClockDisplay();
+    Serial.println(current_hum);
+    Serial.println(current_temp);
+  }
   
   if (!digitalRead(PUSH_1)){
     digitalWrite(TURN_RELAY, !digitalRead(TURN_RELAY));
@@ -218,14 +219,14 @@ bool check_hatcher(){
   //Serial.println(switch_status);
    if (switch_status){
     Serial.print("\n---------------------MODO NACEDORA--------------");
-    tempMax = 35.7;
-    tempMin = 35.5;
+    tempMax = 37.0;
+    tempMin = 36.8;
     digitalWrite(HATCHER_LED,HIGH);
     }
   else{
     Serial.print("\n---------------------MODO INCUBADORA--------------");
-    tempMax = 36.8;
-    tempMin = 36.6;
+    tempMax = 37.5;
+    tempMin = 37.2;
     digitalWrite(INCUBATOR_LED,HIGH);
     }
   Serial.print("\nTemperaturas: \tMIN-> ");
